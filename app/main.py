@@ -46,13 +46,14 @@ app.add_middleware(
 app.include_router(admin.router)
 app.include_router(auth.router)
 
+
 # app.include_router(vote.router)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="pages")
 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("items.html", {"request": request, "message": "Welcome to Mycomm Network Platform"})
+    return templates.TemplateResponse("dashboard.html", {"request": request})
