@@ -11,8 +11,8 @@ router = APIRouter(
     tags=['Admin'])
 
 
-@router.post("/admin_create", status_code=status.HTTP_201_CREATED, response_model=schemas.createreturn)
-async def acreate(user: schemas.admin_create, db: Session = Depends(get_db)):
+@router.post("/admin_create", status_code=status.HTTP_201_CREATED, response_model=schemas.admin)
+async def acreate(user: schemas.admin, db: Session = Depends(get_db)):
     # hast the password - user.password
 
     hasdhed_password = utils.hash(user.password)
@@ -25,37 +25,19 @@ async def acreate(user: schemas.admin_create, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.post("/user_create", status_code=status.HTTP_201_CREATED, response_model=schemas.createreturn)
-async def sacreate(user: schemas.user_create, otp: int, db: Session = Depends(get_db)):
-
-    if otp != 9919:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Incorrect Otp")
-
-    hashed_password = utils.hash(user.password)
-    user.password = hashed_password
-
-    new_user = models.user(**user.dict())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return new_user
-
-
 @router.get('/get_admins')
-def get_subadmins(db: Session = Depends(get_db)):
+def get_admins(db: Session = Depends(get_db)):
     user = db.query(models.admin).all()
 
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"subadmin not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"admin not found")
 
     return user
 
 
-@router.get('/get_admin{phone}', response_model=schemas.createreturn)
-def get_subadmins(phone: int, db: Session = Depends(get_db)):
+@router.get('/get_admin{phone}', response_model=schemas.admin)
+def get_admins(phone: int, db: Session = Depends(get_db)):
     user = db.query(models.admin).filter(
         models.admin.phone == phone).first()
 
@@ -67,7 +49,7 @@ def get_subadmins(phone: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/admin_delete", status_code=status.HTTP_204_NO_CONTENT)
-async def sadelete(phone: int, db: Session = Depends(get_db)):
+async def adelete(phone: int, db: Session = Depends(get_db)):
     post_q = db.query(models.admin).filter(models.admin.phone == phone)
     post = post_q.first()
 
@@ -79,36 +61,15 @@ async def sadelete(phone: int, db: Session = Depends(get_db)):
     return "successfully deleted"
 
 
-@router.get('/get_users')
-def get_user(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_admin)):
-    user = db.query(models.user).all()
+@router.put("/admin{phone}", status_code=status.HTTP_202_ACCEPTED)
+async def update_admin(phone: int, user: schemas.admin, db: Session = Depends(get_db)):
+    bay_q = db.query(models.admin).filter(models.admin.phone == phone)
+    bay = bay_q.first()
 
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"No users found")
-
-    return user
-
-
-@router.get('/get_user{phone}', response_model=schemas.get_user)
-def get_user(phone: int, db: Session = Depends(get_db)):
-    user = db.query(models.user).filter(models.user.phone == phone).first()
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"user with id: {phone} not found")
-
-    return user
-
-
-@router.delete("/user_delete", status_code=status.HTTP_204_NO_CONTENT)
-async def udelete(phone: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_admin)):
-    post_q = db.query(models.user).filter(models.user.phone == phone)
-    post = post_q.first()
-
-    if post == None:
+    if phone == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="not found")
-    post_q.delete(synchronize_session=False)
+
+    bay_q.update(user.dict(), synchronize_session=False)
     db.commit()
-    return "successfully deleted"
+    return bay_q
