@@ -21,7 +21,7 @@ from sqlalchemy.orm import Session
 from . import models
 from . import schemas, utils
 from .database import engine, get_db
-from . routers import admin, auth
+from . routers import admin, auth, user
 from .config import settings
 
 
@@ -45,6 +45,7 @@ app.add_middleware(
 
 app.include_router(admin.router)
 app.include_router(auth.router)
+app.include_router(user.router)
 
 
 # app.include_router(vote.router)

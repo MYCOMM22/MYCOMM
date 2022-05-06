@@ -6,6 +6,24 @@ from datetime import datetime, date, time
 from typing import Optional
 
 
+class user_create(BaseModel):
+    name: str
+    username: str
+    password: str
+
+
+class user_get(BaseModel):
+    name: str
+    username: str
+    phone: int
+
+
+class user_profile(BaseModel):
+    email: str
+    name: str
+    phone: str
+
+
 class admin_create(BaseModel):
     email: str
     name: str
@@ -24,8 +42,8 @@ class createreturn(BaseModel):
         orm_mode = True
 
 
-class user_create(admin_create):
-    pass
+# class user_create(admin_create):
+#     pass
 
 
 class get_user(createreturn):
