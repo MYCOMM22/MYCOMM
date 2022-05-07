@@ -61,3 +61,13 @@ templates = Jinja2Templates(directory="pages")
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
     return templates.TemplateResponse("dashboard.html", {"request": request})
+
+
+@app.get("/smartpole", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse("automotive.html", {"request": request})
+
+
+@app.get("/smartclass", response_class=HTMLResponse)
+async def read_item(request: Request):
+    return templates.TemplateResponse("smart-home.html", {"request": request})
