@@ -2,7 +2,7 @@
   <div class="card h-100">
     <div class="card-body">
       <div class="d-flex mb-4">
-        {% if status.class1 %} <p class="mb-0"></p>ON</p> {% endif %} {% if not status.class1 %} <p class="mb-0"></p>OFF</p>
+        {% if status.class4 %} <p class="mb-0"></p>ON</p> {% endif %} {% if not status.class4 %} <p class="mb-0"></p>OFF</p>
           {% endif %}
         </p>
         <div class="form-check form-switch ms-auto">
@@ -12,7 +12,7 @@
               class="form-check-input"
               type="hidden"
               id="flexSwitchCheckLights"
-              value="class1"
+              value="class4"
               onchange="this.form.submit()"
             />
 
@@ -25,7 +25,7 @@
               onchange="this.form.submit()"
               {%
               if
-              status.class1
+              status.class4
               %}
               checked
               {%
@@ -121,8 +121,8 @@
           </filter>
         </defs>
       </svg>
-      <p class="mt-4 font-weight-bold mb-0">Class 1</p>
-      <span class="text-xs">Consumption: {{p.class1}}</span>
+      <p class="mt-4 font-weight-bold mb-0">Class 4</p>
+      <span class="text-xs">Consumption: {{p.class4}}</span>
     </div>
   </div>
 </div>

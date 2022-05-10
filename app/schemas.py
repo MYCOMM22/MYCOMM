@@ -75,7 +75,7 @@ class smartclass(BaseModel):
     # id: int
     classroom: str
     power_consumption: float
-    switch_status: bool
+    Switchstatus: bool
 
     class Config:
         orm_mode = True
@@ -102,6 +102,40 @@ class device(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class switches(BaseModel):
+    class1: bool
+    class2: bool
+    class3: bool
+    class4: bool
+    class5: bool
+    class6: bool
+    class7: bool
+    class8: bool
+    class9: bool
+    class10: bool
+    class11: bool
+    class12: bool
+    class13: bool
+    class14: bool
+
+
+class power_consumption(BaseModel):
+    class1: float
+    class2: float
+    class3: float
+    class4: float
+    class5: float
+    class6: float
+    class7: float
+    class8: float
+    class9: float
+    class10: float
+    class11: float
+    class12: float
+    class13: float
+    class14: float
 
 
 class Token (BaseModel):
