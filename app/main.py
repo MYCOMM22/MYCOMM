@@ -65,7 +65,7 @@ async def read_item(request: Request):
 
 @app.get("/smartpole", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("automotive.html", {"request": request})
+    return templates.TemplateResponse("smartpole.html", {"request": request})
 
 
 @app.get("/smartclass", response_class=HTMLResponse)

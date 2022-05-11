@@ -51,9 +51,6 @@ async def login(request: Request, user_cred: OAuth2PasswordRequestForm = Depends
         return templates.TemplateResponse(
             "sign-in.html", {"request": request, "invalid": True}, status_code=status.HTTP_401_UNAUTHORIZED)
 
-    # access_token = oauth2.create_access_token_subadmin(
-    #     data={"user_id": user.id})
-    # return {"access_token": access_token, "token_type": "Bearer"}
     access_token_expires = timedelta(
         minutes=settings.access_token_expire_minutes)
     access_token = manager.create_access_token(
@@ -61,8 +58,7 @@ async def login(request: Request, user_cred: OAuth2PasswordRequestForm = Depends
         expires=access_token_expires
     )
     token = str(access_token)
-    # print(access_token)
-    # print(token[2:-1])
+
     resp = RedirectResponse("/user/profile", status_code=status.HTTP_302_FOUND)
     manager.set_cookie(resp, token[2:-1])
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
