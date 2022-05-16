@@ -6,7 +6,7 @@ from fastapi.params import Body
 from pydantic import BaseModel, BaseSettings
 from random import randrange
 
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -60,14 +60,14 @@ templates = Jinja2Templates(directory="pages")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+    return RedirectResponse("/device/mang", status_code=status.HTTP_302_FOUND)
 
 
 @app.get("/smartpole", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("smartpole.html", {"request": request})
+    return RedirectResponse("/smartpole/", status_code=status.HTTP_302_FOUND)
 
 
 @app.get("/smartclass", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("smart-home.html", {"request": request})
+    return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)

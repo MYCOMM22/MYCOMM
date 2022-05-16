@@ -1,14 +1,25 @@
 import re
-from fastapi import Depends, FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import Depends, FastAPI, Response, Request, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
 from .. import models, schemas, utils, oauth2
 from ..database import get_db
 import calendar
 import datetime
+from fastapi.templating import Jinja2Templates
 
 router = APIRouter(
     prefix="/smartpole",
     tags=['smartpole'])
+
+templates = Jinja2Templates(directory="pages")
+
+
+@router.get("/")
+async def read_item(request: Request, db: Session = Depends(get_db)):
+    user = db.query(models.smartpole).first()
+    smartpole = schemas.smartpole(polename=user.polename, Temperature=user.Temperature,
+                                  Humidity=user.Humidity, Air_quality=user.Air_quality, Co2_emission=user.Co2_emission)
+    return templates.TemplateResponse("smartpole.html", {"request": request, "smartpole": smartpole})
 
 
 @router.post("/smartpole_create", status_code=status.HTTP_201_CREATED, response_model=schemas.smartpole)

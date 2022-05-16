@@ -56,6 +56,7 @@ class smartpole(Base):
 class device(Base):
     __tablename__ = "Devices"
     id = Column(Integer, primary_key=True, nullable=False)
-    chip_id = Column(Integer, nullable=False)
-    mac_id = Column(Integer, nullable=False)
-    user_id = Column(Integer, nullable=False)
+    chip_id = Column(String,  nullable=False)
+    mac_id = Column(String,  nullable=False)
+    user_id = Column(Integer,  nullable=False)
+    api_key = Column(String,  nullable=False)

@@ -96,9 +96,8 @@ class smartpole(BaseModel):
 
 class device(BaseModel):
     # id = int
-    chip_id: int
-    mac_id: int
-    user_id: int
+    chip_id: str
+    mac_id: str
 
     class Config:
         orm_mode = True
