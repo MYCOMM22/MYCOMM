@@ -16,7 +16,8 @@ templates = Jinja2Templates(directory="pages")
 
 @router.get("/")
 async def read_item(request: Request, db: Session = Depends(get_db)):
-    user = db.query(models.smartpole).first()
+    all = db.query(models.smartpole).all()
+    user = all[-1]
     smartpole = schemas.smartpole(polename=user.polename, Temperature=user.Temperature,
                                   Humidity=user.Humidity, Air_quality=user.Air_quality, Co2_emission=user.Co2_emission)
     return templates.TemplateResponse("smartpole.html", {"request": request, "smartpole": smartpole})
@@ -24,11 +25,7 @@ async def read_item(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/smartpole_create", status_code=status.HTTP_201_CREATED, response_model=schemas.smartpole)
 async def smartpolecreate(user: schemas.smartpole, db: Session = Depends(get_db)):
-    # hast the password - user.password
-
-    #hasdhed_password = utils.hash(user.password)
-    #user.password = hasdhed_password
-
+    print(user)
     new_user = models.smartpole(**user.dict())
     db.add(new_user)
     db.commit()

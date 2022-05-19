@@ -144,3 +144,7 @@ class Token (BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+
+class test(BaseModel):
+    data: str

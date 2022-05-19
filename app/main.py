@@ -63,6 +63,12 @@ async def read_item(request: Request):
     return RedirectResponse("/device/mang", status_code=status.HTTP_302_FOUND)
 
 
+@app.post("/test")
+async def read_item(data: schemas.smartpole):
+    print(data)
+    return data
+
+
 @app.get("/smartpole", response_class=HTMLResponse)
 async def read_item(request: Request):
     return RedirectResponse("/smartpole/", status_code=status.HTTP_302_FOUND)

@@ -8,10 +8,24 @@ import calendar
 import datetime
 from fastapi.templating import Jinja2Templates
 from typing import Optional
+from ..mqtt import server
+
+
 templates = Jinja2Templates(directory="pages")
 router = APIRouter(
     prefix="/smartclass",
     tags=['smartclass'])
+
+
+@router.get('/data')
+def get_smartclass(db: Session = Depends(get_db)):
+    user = db.query(models.smartclass).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"user not found")
+
+    return "user"
 
 
 @router.get("/control")
@@ -73,6 +87,7 @@ async def acreate(request: Request, classstatus: Optional[str] = Form(False), cl
     db.add(classupdate)
     db.commit()
     db.refresh(classupdate)
+    server.publish(f"{classroom[-1]}{str(classstatus)[0]}")
     return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)
 
 
