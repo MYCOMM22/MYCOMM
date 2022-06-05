@@ -1,3 +1,4 @@
+import schedule
 from logging import exception
 from sqlite3 import Cursor
 from typing import Optional
@@ -21,13 +22,10 @@ from sqlalchemy.orm import Session
 from . import models
 from . import schemas, utils
 from .database import engine, get_db
-from . routers import admin, auth, device, user, smartclass, smartpole
+from . routers import admin, auth, device, user, smartclass, smartpole, dashboard
 from .config import settings
-
-
-import schedule
-import time
-
+from fastapi_login import LoginManager
+from .security import manager
 
 # models.Base.metadata.create_all(bind=engine)
 
@@ -49,6 +47,7 @@ app.include_router(user.router)
 app.include_router(device.router)
 app.include_router(smartpole.router)
 app.include_router(smartclass.router)
+app.include_router(dashboard.router)
 
 
 # app.include_router(vote.router)
@@ -58,9 +57,23 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 templates = Jinja2Templates(directory="pages")
 
 
+class NotAuthenticatedException(Exception):
+    pass
+
+
+def not_authenticated_exception_handler(request, exception):
+
+    return RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
+
+
+manager.not_authenticated_exception = NotAuthenticatedException
+app.add_exception_handler(NotAuthenticatedException,
+                          not_authenticated_exception_handler)
+
+
 @app.get("/", response_class=HTMLResponse)
-async def read_item(request: Request):
-    return RedirectResponse("/device/mang", status_code=status.HTTP_302_FOUND)
+async def read_item(request: Request, email=Depends(manager)):
+    return RedirectResponse("/device/", status_code=status.HTTP_302_FOUND)
 
 
 @app.post("/test")
@@ -70,10 +83,10 @@ async def read_item(data: schemas.smartpole):
 
 
 @app.get("/smartpole", response_class=HTMLResponse)
-async def read_item(request: Request):
+async def read_item(request: Request, email=Depends(manager)):
     return RedirectResponse("/smartpole/", status_code=status.HTTP_302_FOUND)
 
 
 @app.get("/smartclass", response_class=HTMLResponse)
-async def read_item(request: Request):
+async def read_item(request: Request, email=Depends(manager)):
     return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)

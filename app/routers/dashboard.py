@@ -17,48 +17,28 @@ from fastapi.templating import Jinja2Templates
 templates = Jinja2Templates(directory="pages")
 
 router = APIRouter(
-    prefix="/device",
-    tags=['Device'])
+    prefix="/dashboard",
+    tags=['DashBoard'])
 
 
 # routes with html response
 
 @router.get('/')
 def get_devices(request: Request, db: Session = Depends(get_db), email=Depends(manager)):
-    user = list(db.query(models.device).all())
+    rooms = db.query(models.smartclass).order_by(
+        models.smartclass.id).all()
+    rooms = db.query(models.smartclass).order_by(
+        models.smartclass.id).all()
+    all = db.query(models.smartpole).all()
+    user = all[-1]
+    smartpole = schemas.smartpole(polename=user.polename, Temperature=user.Temperature,
+                                  Humidity=user.Humidity, Air_quality=user.Air_quality, Co2_emission=user.Co2_emission)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"device not found")
 
-    return templates.TemplateResponse("settings.html", {"request": request, "devices": user})
-
-
-@router.post("/create", status_code=status.HTTP_201_CREATED)
-async def acreate(mac_id=Form(...), chip_id=Form(...),  db: Session = Depends(get_db), email=Depends(manager)):
-
-    S = 32  # number of characters in the string.
-    ran = ''.join(random.choices(string.ascii_uppercase + string.digits, k=S))
-    user = db.query(models.user).filter(models.user.email == email).first()
-    new_user = models.device(
-        chip_id=chip_id, mac_id=mac_id, user_id=user.id, api_key=ran)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return RedirectResponse("/device/", status_code=status.HTTP_302_FOUND)
-
-
-@router.post("/delete")
-async def device_delete(id=Form(...), db: Session = Depends(get_db), email=Depends(manager)):
-    post_q = db.query(models.device).filter(models.device.id == id)
-    post = post_q.first()
-
-    if post == None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail="not found")
-    post_q.delete(synchronize_session=False)
-    db.commit()
-    return RedirectResponse("/device/", status_code=status.HTTP_302_FOUND)
+    return templates.TemplateResponse("dashboard.html", {"request": request, "rooms": rooms, "smartpole": smartpole})
 
 
 # routes without html response

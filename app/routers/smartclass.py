@@ -9,6 +9,7 @@ import datetime
 from fastapi.templating import Jinja2Templates
 from typing import Optional
 from ..mqtt import server
+from ..security import manager
 
 
 templates = Jinja2Templates(directory="pages")
@@ -28,55 +29,6 @@ def get_smartclass(db: Session = Depends(get_db)):
     return "user"
 
 
-@router.get("/control")
-async def acreate(request: Request,  db: Session = Depends(get_db)):
-
-    list1 = ["class1", "class2", "class3", "class4", "class5", "class6", "class7",
-             "class8", "class9", "class10", "class11", "class12", "class13", "class14"]
-    list2 = []
-    list3 = []
-    for i in list1:
-        class1 = db.query(models.smartclass).filter(
-            models.smartclass.classroom == i).first()
-        list2.append(class1.Switchstatus)
-        list3.append(class1.power_consumption)
-
-    power_consumption = schemas.power_consumption(
-        class1=list3[0],
-        class2=list3[1],
-        class3=list3[2],
-        class4=list3[3],
-        class5=list3[4],
-        class6=list3[5],
-        class7=list3[6],
-        class8=list3[7],
-        class9=list3[8],
-        class10=list3[9],
-        class11=list3[10],
-        class12=list3[11],
-        class13=list3[12],
-        class14=list3[13])
-
-    Switchstatus = schemas.switches(
-        class1=list2[0],
-        class2=list2[1],
-        class3=list2[2],
-        class4=list2[3],
-        class5=list2[4],
-        class6=list2[5],
-        class7=list2[6],
-        class8=list2[7],
-        class9=list2[8],
-        class10=list2[9],
-        class11=list2[10],
-        class12=list2[11],
-        class13=list2[12],
-        class14=list2[13])
-
-    return templates.TemplateResponse(
-        "smart-home.html", {"request": request, "status": Switchstatus, "p": power_consumption}, status_code=status.HTTP_401_UNAUTHORIZED)
-
-
 @router.post("/control")
 async def acreate(request: Request, classstatus: Optional[str] = Form(False), classroom=Form(...), db: Session = Depends(get_db)):
     # print(classroom)
@@ -88,6 +40,41 @@ async def acreate(request: Request, classstatus: Optional[str] = Form(False), cl
     db.commit()
     db.refresh(classupdate)
     server.publish(f"{classroom[-1]}{str(classstatus)[0]}")
+    return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/control")
+async def acreate(request: Request,  db: Session = Depends(get_db), email=Depends(manager)):
+
+    class1 = db.query(models.smartclass).order_by(
+        models.smartclass.id).all()
+    # return class1
+
+    return templates.TemplateResponse(
+        "smartclass.html", {"request": request, "class1": class1}, status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+@router.post("/delete")
+async def device_delete(id=Form(...), db: Session = Depends(get_db), email=Depends(manager)):
+    post_q = db.query(models.smartclass).filter(models.smartclass.id == id)
+    post = post_q.first()
+
+    if post == None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="not found")
+    post_q.delete(synchronize_session=False)
+    db.commit()
+    return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)
+
+
+@router.post("/smartclass_create_FE", status_code=status.HTTP_201_CREATED)
+async def acreate(classname=Form(...), deviceid=Form(...), db: Session = Depends(get_db), email=Depends(manager)):
+
+    new_user = models.smartclass(
+        classroom=classname, power_consumption=deviceid, Switchstatus=False)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     return RedirectResponse("/smartclass/control", status_code=status.HTTP_302_FOUND)
 
 

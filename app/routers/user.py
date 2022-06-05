@@ -40,6 +40,7 @@ async def login(name=Form(...), email=Form(...), phone=Form(...), password=Form(
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    return RedirectResponse("/login", status_code=status.HTTP_302_FOUND)
     return new_user
 
 

@@ -1,0 +1,94 @@
+<!--
+=========================================================
+* Argon Dashboard 2 - v2.0.2
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+<!DOCTYPE html>
+<html lang="en">
+{% include 'head.html'%}
+
+  <body class="g-sidenav-show bg-gray-100">
+    <div class="min-height-300 bg-primary position-absolute w-100"></div>
+    {% include 'sidebar.html'%}
+
+    <main class="main-content position-relative border-radius-lg ">
+      {% include 'navbar.html'%}
+
+      <div class="row mt-2 ms-2 ">
+        <div class="col-lg-11 mb-lg-0 mb-4 ">
+          <div class="card ">
+            <div class="card-header pb-0 p-3">
+              <div class="d-flex justify-content-between">
+                <h6 class="mb-2">Linked devices</h6>
+              </div>
+            </div>
+            <div class="table-responsive">
+              
+              <table class="table align-items-center">
+                <tbody>
+                  {% for device in devices %} {% include 'device.html' %} {%
+                  endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-4  ">
+          <div class="col-lg-auto mb-lg-0 mb-4 ">
+            <div class="card ">
+              <div class="card-header pb-0 p-3 ">
+                <div class="d-flex justify-content-between">
+                  <h6 class="mb-2">Add new device</h6>
+                </div>
+                <form action="/device/create" method="post">
+                
+                    <div class="left">
+                      <input
+                        type="mt-4"
+                        name="mac_id"
+                        class="form-control form-control-lg"
+                        placeholder="MAC ID"
+                        aria-label="MAC ID"
+                      />
+                    </div>
+                    <div class="mt-4">
+                      <input
+                        type="text"
+                        name="chip_id"
+                        class="form-control form-control-lg"
+                        placeholder="Chip ID"
+                        aria-label="Chip ID"
+                      />
+                    </div>
+                    <div class="text-center">
+                      <button
+                        type="submit"
+                        class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0"
+                      >
+                        Add Device
+                      </button>
+                    </div>
+                  </div>
+                </form>
+            </div>
+          </div>
+        </div>
+        
+      
+        
+
+          {% include 'footer.html'%}
+          
+        </main>
+  </body>
+</html>

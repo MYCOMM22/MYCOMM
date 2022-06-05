@@ -1,3 +1,4 @@
+from starlette.responses import RedirectResponse
 from typing import Dict
 from urllib import response
 from fastapi import Depends, FastAPI, Response, status, HTTPException, Depends, APIRouter, Request, Form
@@ -9,27 +10,16 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi_login import LoginManager
+
 from ..config import settings
 from datetime import timedelta
 from ..database import get_db
-#from ..main import app
-
-# router.mount("/assets", StaticFiles(directory="assets"), name="assets")
+from ..security import manager
 
 
 templates = Jinja2Templates(directory="pages")
 
 router = APIRouter(tags=["Authentication"])
-
-manager = LoginManager(
-    secret=settings.secret_key_admin, token_url="/login", use_cookie=True)
-manager.cookie_name = "auth"
-
-
-@manager.user_loader()
-async def get_user_data(email: str):
-    return email
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -62,7 +52,15 @@ async def login(request: Request, user_cred: OAuth2PasswordRequestForm = Depends
     resp = RedirectResponse("/user/profile", status_code=status.HTTP_302_FOUND)
     manager.set_cookie(resp, token[2:-1])
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+
     return resp
+
+
+@router.get("/logout")
+def logout():
+    response = RedirectResponse("/login")
+    manager.set_cookie(response, None)
+    return response
 
 
 @ router.post('/slogin', response_model=schemas.Token)
