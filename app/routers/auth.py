@@ -49,7 +49,7 @@ async def login(request: Request, user_cred: OAuth2PasswordRequestForm = Depends
     )
     token = str(access_token)
 
-    resp = RedirectResponse("/user/profile", status_code=status.HTTP_302_FOUND)
+    resp = RedirectResponse("/dashboard", status_code=status.HTTP_302_FOUND)
     manager.set_cookie(resp, token[2:-1])
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
 
